@@ -32,6 +32,11 @@ GENERIC_ANCHORS = {
 
 STOPWORDS = set("""a an the and or but if then else for to of in on at by with from as is are was were be been being this that these those it its we you they he she them our your their i me my mine our ours us not no yes do does did doing have has had having will would can could should may might must shall about into over under again further once here there all any both each few more most other some such only own same so than too very s t can just don now get got also into out up down off above below""".split())
 
+DOMAIN_STOPWORDS = {
+    "nmg", "estimated", "development", "design", "website",
+    "business", "team", "software", "web", "app", "mobile", "marketing"
+}
+
 
 # --------------------------------------------------------------------------- #
 # parsing helpers
@@ -290,8 +295,12 @@ def cluster_pages(pages, page_text, n_keywords=12) -> dict:
         page_kws = page_keywords(p, page_text.get(u, ""), n_keywords)
         kw[u] = page_kws
 
-        # Cluster by the most dominant keyword
-        top_kw = page_kws[0] if page_kws else "(no-keywords)"
+        # Cluster by the first keyword NOT in DOMAIN_STOPWORDS
+        top_kw = next((w for w in page_kws if w not in DOMAIN_STOPWORDS), None)
+        if top_kw is None:
+            # Fallback to original first keyword or default
+            top_kw = page_kws[0] if page_kws else "(no-keywords)"
+
         clusters[top_kw].append(u)
 
     out = []
