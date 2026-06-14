@@ -286,10 +286,13 @@ def cluster_pages(pages, page_text, n_keywords=12) -> dict:
     kw = {}
     for p in idx200:
         u = _norm(p["Address"])
-        path = urlparse(u).path.strip("/")
-        seg = path.split("/")[0] if path else "(home)"
-        clusters[seg].append(u)
-        kw[u] = page_keywords(p, page_text.get(u, ""), n_keywords)
+        # Compute keywords first so we can use them for clustering
+        page_kws = page_keywords(p, page_text.get(u, ""), n_keywords)
+        kw[u] = page_kws
+
+        # Cluster by the most dominant keyword
+        top_kw = page_kws[0] if page_kws else "(no-keywords)"
+        clusters[top_kw].append(u)
 
     out = []
     inl = {_norm(p["Address"]): _int(p.get("Unique Inlinks")) for p in idx200}

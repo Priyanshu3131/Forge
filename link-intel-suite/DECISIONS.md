@@ -25,3 +25,13 @@ Format:
 
 ## My log
 - `[--:--]` ...
+
+Decision #2
+
+Current clustering groups pages by URL path segment.
+
+Issue:
+Pages with different topics can end up in the same cluster.
+
+Planned Improvement:
+Move toward content-based clustering using page_keywords() output.

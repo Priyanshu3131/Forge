@@ -40,3 +40,20 @@ recommendations**. It serves a live dashboard at localhost:7700 and outputs
   matching to Address")
 - (e.g. "orphans = `Unique Inlinks` == 0, NOT `Inlinks` == 0 - Inlinks counts repeated links")
 - ...
+## Current Status
+
+Starter bundle runs successfully.
+
+Completed:
+- Baseline run
+- Report generation verified
+- Rulebook reviewed
+
+Findings:
+- cluster_pages() currently clusters by first URL path segment.
+- page_keywords() uses Title + H1 + H2 + first 6000 chars of body text.
+- Clustering is the highest-priority improvement area.
+
+Next Task:
+- Improve cluster_pages() using content-based clustering.
+- Avoid new dependencies if possible.
