@@ -16,6 +16,8 @@ Format:
 - `[14:30]` Headless AI integration -> Integrated LLM calls directly into `run.py` to ensure the grader captures model-driven results (entity extraction and contextual anchors) without requiring interactive agent orchestration.
 - `[14:35]` Page selection optimization -> Decided to process only hub pages for entity extraction and top 3 candidates for anchors to keep model usage within reasonable limits.
 
+- `[16:00]` Dashboard visibility & persistence -> Introduced `time.sleep(1)` delays between analysis stages in `run.py` to make real-time updates human-perceivable, and added `server._run_mcp()` at the end of the pipeline to keep the server process alive after analysis completes.
+
 Decision #2
 Current clustering groups pages by URL path segment.
 

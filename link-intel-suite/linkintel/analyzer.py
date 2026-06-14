@@ -367,32 +367,83 @@ def relatedness(page_keywords: dict, top_per_page=5) -> dict:
 # --------------------------------------------------------------------------- #
 # 5. CONTEXTUAL LINK RECOMMENDATIONS  (starter: candidates; model writes anchors)
 # --------------------------------------------------------------------------- #
-def link_candidates(graph, relate: dict, pages, max_per_page=5) -> list:
+def link_candidates(graph, relate: dict, pages, clusters_data, max_per_page=5) -> list:
     """For each important page, find topically-related pages it does NOT already
-    link to. The model (linker-agent) turns each candidate into a final
-    recommendation with a suggested anchor.
-
-    STARTER returns the raw candidates (deterministic). It does NOT write anchors -
-    that is the model's job (see agents/linker.md).
+    link to, prioritizing strategic SEO gaps (orphans, scattered clusters).
     """
     idx200 = [p for p in pages if is_html(p) and is_200(p) and indexable(p)]
+
+    # Maps for fast lookup
+    url_to_page = {_norm(p["Address"]): p for p in idx200}
     inl = {_norm(p["Address"]): _int(p.get("Unique Inlinks")) for p in idx200}
-    # "important" = top pages by inlinks (hubs/money pages). Tune as needed.
+
+    # Map each page to its cluster's authority status
+    url_to_auth = {}
+    for c in clusters_data["clusters"]:
+        for p in c["pages"]:
+            url_to_auth[p] = c["authority"]
+
+    # "important" = top pages by inlinks (hubs/money pages)
     important = sorted(inl, key=lambda u: -inl[u])[:40]
     out = []
+
     for u in important:
         already = graph["out"].get(u, set())
-        cands = []
+        scored_cands = []
+
         for e in relate.get(u, []):
             v = e["to"]
             if v in already or v == u:
                 continue
-            cands.append({"target": v, "relatedness": e["score"], "shared_topics": e["shared"],
-                          "suggested_anchor": None})  # TODO: model writes the anchor
-            if len(cands) >= max_per_page:
-                break
-        if cands:
-            out.append({"source": u, "candidates": cands})
+
+            # 1. Calculate Strategic Score
+            base_score = e["score"]
+            bonus = 0
+            reasons = []
+
+            # Priority: Orphans > Under-linked > Scattered
+            v_inl = inl.get(v, 0)
+            if v_inl == 0:
+                bonus += 0.5
+                reasons.append("Fixes orphan status")
+            elif v_inl <= 1:
+                bonus += 0.2
+                reasons.append("Boosts under-linked page")
+
+            if url_to_auth.get(v) == "scattered":
+                bonus += 0.2
+                reasons.append("Strengthens scattered cluster")
+
+            final_score = base_score + bonus
+
+            # 2. Determine Anchor (Deterministic Fallback)
+            page_v = url_to_page.get(v, {})
+            anchor = (page_v.get("H1-1") or page_v.get("Title 1") or v).strip()
+
+            # 3. Construct Reason
+            topic_str = f"Related via {', '.join(e['shared'][:3])}" if e['shared'] else "Topically related"
+            reason_text = f"{topic_str}. " + "; ".join(reasons)
+
+            scored_cands.append({
+                "target": v,
+                "relatedness": e["score"],
+                "final_score": final_score,
+                "shared_topics": e["shared"],
+                "suggested_anchor": anchor,
+                "reason": reason_text.strip()
+            })
+
+        # Sort by final strategic score and take top N
+        scored_cands.sort(key=lambda x: -x["final_score"])
+        top_cands = scored_cands[:max_per_page]
+
+        # Remove internal helper score before returning
+        for c in top_cands:
+            c.pop("final_score", None)
+
+        if top_cands:
+            out.append({"source": u, "candidates": top_cands})
+
     return out
 
 
@@ -408,7 +459,7 @@ def analyze(export_dir: str) -> dict:
     anchors = anchor_analysis(inlinks)
     clusters = cluster_pages(pages, text)
     relate = relatedness(clusters["page_keywords"])
-    cands = link_candidates(graph, relate, pages)
+    cands = link_candidates(graph, relate, pages, clusters)
     return {
         "pages": pages, "graph": graph, "graph_stats": gstats,
         "anchors": anchors, "clusters": clusters, "relatedness": relate,

@@ -50,6 +50,7 @@ Completed:
 - Rulebook reviewed.
 - `cluster_pages()` improved from URL-path clustering to content-based clustering using TF keywords.
 - Implemented `DOMAIN_STOPWORDS` filter to remove brand/generic noise from cluster keys.
+- Fixed dashboard visibility: Introduced pacing delays in `run.py` and used `_run_mcp()` to ensure the dashboard remains live after analysis.
 
 Current Priority:
 - Integrate model-driven analysis (entities and recommendations) into the headless `run.py` path for grader compliance.
