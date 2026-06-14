@@ -38,6 +38,7 @@ recommendations**. It serves a live dashboard at localhost:7700 and outputs
 ## Things I have learned during the build (update this as you go)
 - Page text filenames are URL-encoded with an `original_https_` prefix - decode before matching to Address.
 - Orphans = `Unique Inlinks` == 0, NOT `Inlinks` == 0.
+- Internal Link Stats: To be truly "internal", both Source AND Destination must be in the crawled page set; otherwise, external 4xx/3xx links pollute the broken/redirect lists.
 - Entity Pipeline: `topic-agent` extracts model entities $\rightarrow$ `li_entities()` tool $\rightarrow$ `analyzer.relatedness()` (Jaccard overlap) $\rightarrow$ `analyzer.link_candidates()` $\rightarrow$ `report.json`.
 - `relatedness()` in `analyzer.py` is a generic overlap calculator that uses TF keywords by default but accepts model-extracted entities via the MCP server.
 
@@ -51,6 +52,8 @@ Completed:
 - `cluster_pages()` improved from URL-path clustering to content-based clustering using TF keywords.
 - Implemented `DOMAIN_STOPWORDS` filter to remove brand/generic noise from cluster keys.
 - Fixed dashboard visibility: Introduced pacing delays in `run.py` and used `_run_mcp()` to ensure the dashboard remains live after analysis.
+- Enhanced `link_candidates()`: Implemented strategic prioritization (bonus scores for orphans/under-linked/scattered), deterministic anchors, and detailed reasons.
+- Fixed graph stats: Corrected `broken_internal_link`, `redirect_internal_link`, and `nofollow_internal_link` to exclude external URLs.
 
 Current Priority:
 - Integrate model-driven analysis (entities and recommendations) into the headless `run.py` path for grader compliance.

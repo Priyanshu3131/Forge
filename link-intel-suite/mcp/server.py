@@ -31,7 +31,7 @@ from linkintel import analyzer  # noqa: E402
 RUN = {"site": None, "urls": 0, "status": "idle",
        "graph_stats": None, "anchors": None, "clusters": None,
        "entities": None, "relatedness": None, "recommendations": None,
-       "summary": None}
+       "link_recommendations": None, "summary": None}
 _A = {}            # full analysis blob (kept out of RUN so /state stays light)
 _subs: list[queue.Queue] = []
 _lock = threading.Lock()
@@ -126,8 +126,10 @@ def li_set_recommendations(recommendations: list) -> dict:
     Each item: {source, target, suggested_anchor, relatedness, reason}.
     """
     _A["final_recs"] = recommendations or []
+    RUN["link_recommendations"] = _A["final_recs"]
     RUN["recommendations"] = len(_A["final_recs"])
-    _emit("recommendations", {"count": RUN["recommendations"]})
+    _emit("recommendations", {"count": RUN["recommendations"],
+                              "items": RUN["link_recommendations"]})
     return {"count": RUN["recommendations"]}
 
 
@@ -154,6 +156,7 @@ def _report_obj() -> dict:
         "link_recommendations": len(recs),
     }
     RUN["summary"] = summary
+    RUN["link_recommendations"] = recs
     return {
         "site": RUN["site"],
         "pages_crawled": g["pages_total"],
@@ -192,7 +195,10 @@ def li_report() -> dict:
     os.makedirs(OUT_DIR, exist_ok=True)
     p = os.path.join(OUT_DIR, "report.json")
     json.dump(_report_obj(), open(p, "w", encoding="utf-8"), indent=2)
-    RUN["status"] = "done"; _emit("saved", {"path": p}); return {"path": p}
+    RUN["status"] = "done"
+    _emit("saved", {"path": p, "summary": RUN["summary"],
+                    "link_recommendations": RUN["link_recommendations"]})
+    return {"path": p}
 
 
 def li_export() -> dict:

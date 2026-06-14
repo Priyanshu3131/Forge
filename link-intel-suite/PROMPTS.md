@@ -18,24 +18,24 @@ Format per entry:
 
 ## My prompts
 
-- **Prompt:** "Improve cluster_pages(). Current implementation: Pages are clustered by first URL path segment. Goal: Replace URL-based clustering with deterministic content-based clustering using existing page_keywords() output. Constraints: No new dependencies unless clearly justified. Keep report.json structure unchanged. Maintain hidden-dataset compatibility. Inspect cluster_pages() and propose the smallest high-impact change."
-- **For:** Replacing URL-based clustering with deterministic content-based clustering using TF keywords.
-- **Revised?** No.
-
----
-
-- **Prompt:** "Inspect cluster_pages(). The current implementation clusters pages using the first keyword returned by page_keywords(). Problem: Many cluster keys are generic or brand-specific rather than topical. Examples: nmg, estimated, development, design, website, business, team, software, web, app, mobile, marketing. Task: 1. Add a DOMAIN_STOPWORDS set inside analyzer.py. 2. When selecting the cluster key, choose the first keyword that is NOT in DOMAIN_STOPWORDS. 3. If all keywords are filtered out, fall back to the original first keyword."
-- **For:** Improving topical cluster quality by filtering out brand and generic agency-wide terms from cluster keys.
-- **Revised?** No.
-
----
-
-- **Prompt:** "Extract 5-10 key entities from the following page text. An entity is a specific person, organization, technology, or unique concept (e.g., 'React', 'SaaS', 'Azure'). Avoid generic words like 'business' or 'service'. Return the entities as a simple comma-separated list."
-- **For:** Headless entity extraction for hub pages in run.py.
-- **Revised?** Pending implementation.
-
----
-
-- **Prompt:** "You are an SEO expert. Write a high-quality, contextual internal link anchor for a link from [Source URL] to [Target URL]. The target page is about [Target Topic]. The source page text is: [Source Text]. The anchor should be descriptive, naturally integrated, and use keywords that signal authority. Return only the anchor text and a brief one-sentence reason for the choice."
-- **For:** Headless contextual link recommendation generation in run.py.
-- **Revised?** Pending implementation.
+- Prompt: "Improve cluster_pages(). Current implementation: Pages are clustered by first URL path segment. Goal: Replace URL-based clustering with deterministic content-based clustering using existing page_keywords() output. Constraints: No new dependencies unless clearly justified. Keep report.json structure unchanged. Maintain hidden-dataset compatibility. Inspect cluster_pages() and propose the smallest high-impact change."
+For: Replacing URL-based clustering with deterministic content-based clustering using TF keywords.
+Revised? No.
+Prompt: "Inspect cluster_pages(). The current implementation clusters pages using the first keyword returned by page_keywords(). Problem: Many cluster keys are generic or brand-specific rather than topical. Examples: nmg, estimated, development, design, website, business, team, software, web, app, mobile, marketing. Task: 1. Add a DOMAIN_STOPWORDS set inside analyzer.py. 2. When selecting the cluster key, choose the first keyword that is NOT in DOMAIN_STOPWORDS. 3. If all keywords are filtered out, fall back to the original first keyword."
+For: Improving topical cluster quality by filtering out brand and generic agency-wide terms from cluster keys.
+Revised? No.
+Prompt: "Read linkintel/analyzer.py and locate the function responsible for generating internal link recommendations (link_candidates() or equivalent). Analyze the current recommendation pipeline and compare it against the Forge Sprint 01 rulebook. Identify whether orphan pages, under-linked pages, and scattered clusters are considered. Recommend the smallest deterministic changes that improve recommendation quality without changing the report schema."
+For: Auditing recommendation generation against the rulebook before implementing prioritization improvements.
+Revised? No.
+Prompt: "Implement recommendation prioritization improvements in link_candidates(). Add scoring bonuses for orphan pages, under-linked pages, and pages belonging to scattered clusters. Preserve deterministic behavior, existing report.json schema, and hidden-dataset compatibility."
+For: Improving contextual link recommendation quality and aligning recommendation ranking with the rulebook.
+Revised? No.
+Prompt: "Populate suggested_anchor and reason fields for contextual link recommendations. Use deterministic page metadata (H1, title, shared keywords) rather than model calls. Ensure anchors are descriptive and reasons explain topical similarity and structural SEO benefits."
+For: Completing recommendation outputs with actionable anchors and explanations.
+Revised? No.
+Prompt: "Inspect broken_internal_link detection. The rulebook states that both Source and Destination must be crawled pages. Verify whether external URLs are being included in broken_internal_link, redirect_internal_link, or nofollow_internal_link detection. Trace the code path and propose the smallest rulebook-compliant fix."
+For: Identifying and correcting incorrect inclusion of external URLs in internal-link reporting.
+Revised? No.
+Prompt: "Trace the data flow from link_candidates() through report generation and dashboard rendering. Determine why report.json contains link recommendations while the dashboard displays 'No recommendations yet'. Identify the smallest fix that exposes existing recommendation data to the dashboard."
+For: Debugging dashboard recommendation rendering and ensuring generated recommendations are visible during review.
+Revised? No.

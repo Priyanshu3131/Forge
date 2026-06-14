@@ -36,6 +36,15 @@ function paint(RUN){
     set("k-recs", typeof RUN.recommendations === "number" ? RUN.recommendations : RUN.recommendations);
   }
   if(s) set("k-recs", s.link_recommendations);
+  if(RUN.link_recommendations){
+    const short = (u) => (u || "").replace(/^https?:\/\//, "");
+    const html = RUN.link_recommendations.slice(0, 40).map(r =>
+      `<div class="rec"><span class="mono">${short(r.source)}</span> → <span class="mono">${short(r.target)}</span><br>`+
+      `<span class="a">${r.suggested_anchor || "(write anchor)"}</span>`+
+      (r.relatedness != null ? ` <span class="st">${r.relatedness}</span>` : "")+
+      `</div>`).join("");
+    $("recs").innerHTML = html || '<div class="empty">No recommendations yet.</div>';
+  }
 }
 
 function feed(line){
@@ -55,8 +64,17 @@ function onEvent(evt){
   if(event === "anchors"){ RUN.anchors = data; feed(`anchors: ${data.generic} generic, ${data.empty_or_image_only} empty`); }
   if(event === "topics"){ RUN.clusters = data.clusters; feed(`topics: ${data.clusters.length} clusters`); }
   if(event === "entities"){ RUN.entities = data; feed(`entities on ${data.pages_with_entities} pages`); }
-  if(event === "recommendations"){ RUN.recommendations = data.count; feed(`${data.count} link recommendations`); }
-  if(event === "saved"){ RUN.status = "done"; feed("report.json written"); }
+  if(event === "recommendations"){
+    RUN.recommendations = data.count;
+    if(data.items) RUN.link_recommendations = data.items;
+    feed(`${data.count} link recommendations`);
+  }
+  if(event === "saved"){
+    RUN.status = "done";
+    if(data.summary) RUN.summary = data.summary;
+    if(data.link_recommendations) RUN.link_recommendations = data.link_recommendations;
+    feed("report.json written");
+  }
   if(event === "exported"){ feed("report.html exported"); }
   paint(RUN);
 }
