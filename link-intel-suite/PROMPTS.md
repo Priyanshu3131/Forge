@@ -16,16 +16,26 @@ Format per entry:
 
 ---
 
-## Example (replace with your own)
+## My prompts
 
-- **Prompt:** "Extend linkintel/analyzer.py over_optimized_anchors: flag a destination where
-  one non-generic anchor is >= 60% of all internal anchors pointing at it AND count >= 10.
-  Run python linkintel/analyzer.py and show the counts."
-- **For:** completing the over-optimized exact-match anchor rule
-- **Revised?** Yes - first version flagged tiny destinations; added the count >= 10 floor.
+- **Prompt:** "Improve cluster_pages(). Current implementation: Pages are clustered by first URL path segment. Goal: Replace URL-based clustering with deterministic content-based clustering using existing page_keywords() output. Constraints: No new dependencies unless clearly justified. Keep report.json structure unchanged. Maintain hidden-dataset compatibility. Inspect cluster_pages() and propose the smallest high-impact change."
+- **For:** Replacing URL-based clustering with deterministic content-based clustering using TF keywords.
+- **Revised?** No.
 
 ---
 
-## My prompts
-1. ...
-2. ...
+- **Prompt:** "Inspect cluster_pages(). The current implementation clusters pages using the first keyword returned by page_keywords(). Problem: Many cluster keys are generic or brand-specific rather than topical. Examples: nmg, estimated, development, design, website, business, team, software, web, app, mobile, marketing. Task: 1. Add a DOMAIN_STOPWORDS set inside analyzer.py. 2. When selecting the cluster key, choose the first keyword that is NOT in DOMAIN_STOPWORDS. 3. If all keywords are filtered out, fall back to the original first keyword."
+- **For:** Improving topical cluster quality by filtering out brand and generic agency-wide terms from cluster keys.
+- **Revised?** No.
+
+---
+
+- **Prompt:** "Extract 5-10 key entities from the following page text. An entity is a specific person, organization, technology, or unique concept (e.g., 'React', 'SaaS', 'Azure'). Avoid generic words like 'business' or 'service'. Return the entities as a simple comma-separated list."
+- **For:** Headless entity extraction for hub pages in run.py.
+- **Revised?** Pending implementation.
+
+---
+
+- **Prompt:** "You are an SEO expert. Write a high-quality, contextual internal link anchor for a link from [Source URL] to [Target URL]. The target page is about [Target Topic]. The source page text is: [Source Text]. The anchor should be descriptive, naturally integrated, and use keywords that signal authority. Return only the anchor text and a brief one-sentence reason for the choice."
+- **For:** Headless contextual link recommendation generation in run.py.
+- **Revised?** Pending implementation.

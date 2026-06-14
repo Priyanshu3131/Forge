@@ -36,24 +36,26 @@ recommendations**. It serves a live dashboard at localhost:7700 and outputs
 - Run `python run.py sample-export/` to test end to end.
 
 ## Things I have learned during the build (update this as you go)
-- (e.g. "page text filenames are URL-encoded with an `original_https_` prefix - decode before
-  matching to Address")
-- (e.g. "orphans = `Unique Inlinks` == 0, NOT `Inlinks` == 0 - Inlinks counts repeated links")
-- ...
+- Page text filenames are URL-encoded with an `original_https_` prefix - decode before matching to Address.
+- Orphans = `Unique Inlinks` == 0, NOT `Inlinks` == 0.
+- Entity Pipeline: `topic-agent` extracts model entities $\rightarrow$ `li_entities()` tool $\rightarrow$ `analyzer.relatedness()` (Jaccard overlap) $\rightarrow$ `analyzer.link_candidates()` $\rightarrow$ `report.json`.
+- `relatedness()` in `analyzer.py` is a generic overlap calculator that uses TF keywords by default but accepts model-extracted entities via the MCP server.
+
 ## Current Status
 
 Starter bundle runs successfully.
 
 Completed:
-- Baseline run
-- Report generation verified
-- Rulebook reviewed
+- Baseline run and report generation verified.
+- Rulebook reviewed.
+- `cluster_pages()` improved from URL-path clustering to content-based clustering using TF keywords.
+- Implemented `DOMAIN_STOPWORDS` filter to remove brand/generic noise from cluster keys.
 
-Findings:
-- cluster_pages() currently clusters by first URL path segment.
-- page_keywords() uses Title + H1 + H2 + first 6000 chars of body text.
-- Clustering is the highest-priority improvement area.
+Current Priority:
+- Integrate model-driven analysis (entities and recommendations) into the headless `run.py` path for grader compliance.
 
-Next Task:
-- Improve cluster_pages() using content-based clustering.
-- Avoid new dependencies if possible.
+Next Steps:
+- Implement a basic LLM invocation utility in `run.py`.
+- Implement entity extraction loop for hub pages (LLM $\rightarrow$ `li_entities()`).
+- Implement contextual anchor generation loop for top candidates (LLM $\rightarrow$ `li_set_recommendations()`).
+- Refine `DOMAIN_STOPWORDS` to further remove noise.

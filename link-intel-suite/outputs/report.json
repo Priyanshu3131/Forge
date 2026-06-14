@@ -31790,6 +31790,6 @@
   "run_meta": {
     "model": "gpt-oss:20b-cloud",
     "model_calls": 0,
-    "duration_sec": 1.0
+    "duration_sec": 5.8
   }
 }

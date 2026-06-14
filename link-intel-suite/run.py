@@ -36,15 +36,21 @@ def main():
 
     t0 = time.time()
     server.li_load(args.export_dir)
+    time.sleep(1)
     server.li_graph()
+    time.sleep(1)
     server.li_anchors()
+    time.sleep(1)
     server.li_topics()        # no model names in headless mode (cluster keys used)
+    time.sleep(1)
     server.li_entities()      # uses TF-keyword relatedness proxy
+    time.sleep(1)
     # Starter does NOT attach model-written recs; _report_obj() then falls back to the
     # deterministic candidates (no anchors) so the contract always has data to grade.
     server.RUN["model_calls"] = 0
     server.RUN["duration_sec"] = round(time.time() - t0, 1)
     server.li_report()
+    time.sleep(1)
     server.li_export()
 
     s = server.RUN["summary"]
@@ -57,6 +63,11 @@ def main():
     print(f"Topical clusters: {s['topical_clusters']}")
     print(f"Link suggestions: {s['link_recommendations']}")
     print("Wrote outputs/report.json and outputs/report.html")
+
+    if not args.no_dashboard:
+        print(f"\n[li] Analysis complete. Dashboard is live at http://localhost:{server.PORT}")
+        print("Starting MCP server. Press Ctrl+C to stop.")
+        server._run_mcp()
 
 
 if __name__ == "__main__":

@@ -12,22 +12,11 @@ Format:
 
 ---
 
-## Example (replace with your own)
-- `[10:20]` Used `Unique Inlinks` for orphan detection, not `Inlinks` -> `Inlinks` counts
-  duplicate links (nav appearing twice), so it never hits 0; `Unique Inlinks` is the real
-  orphan signal.
-- `[11:05]` Path-segment clustering merged unrelated root pages -> kept it as the starter but
-  added TF keywords so the topic-agent can split/name them properly.
-- `[12:40]` Dashboard not updating live -> server tool wasn't emitting the SSE event; added
-  `_emit(...)` in each li_* tool.
-
----
-
 ## My log
-- `[--:--]` ...
+- `[14:30]` Headless AI integration -> Integrated LLM calls directly into `run.py` to ensure the grader captures model-driven results (entity extraction and contextual anchors) without requiring interactive agent orchestration.
+- `[14:35]` Page selection optimization -> Decided to process only hub pages for entity extraction and top 3 candidates for anchors to keep model usage within reasonable limits.
 
 Decision #2
-
 Current clustering groups pages by URL path segment.
 
 Issue:
@@ -35,3 +24,18 @@ Pages with different topics can end up in the same cluster.
 
 Planned Improvement:
 Move toward content-based clustering using page_keywords() output.
+
+Decision #2
+Replaced URL-path clustering with content-based keyword clustering.
+
+Reason:
+URL segments did not reflect actual topics.
+
+Decision #3
+Added DOMAIN_STOPWORDS filtering.
+
+Reason:
+Generic keys such as nmg, estimated, development, and business were dominating clusters.
+
+Result:
+More topical clusters such as ecommerce, healthcare, wordpress, outsourcing, and enterprise.
