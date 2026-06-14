@@ -183,19 +183,24 @@ def graph_stats(pages, inlinks, graph) -> dict:
         or sorted([u for u, n in inl.items() if over_thresh and n >= over_thresh])
 
     # broken / redirect / nofollow internal links (from all_inlinks)
+    page_set = {_norm(p["Address"]) for p in pages}
     broken, redir, nofollow = [], [], []
     for r in inlinks:
-        sc = _int(r.get("Status Code"))
-        typ = r.get("Type", "")
-        dst = _norm(r.get("Destination", ""))
+        if r.get("Type") != "Hyperlink":
+            continue
         src = _norm(r.get("Source", ""))
-        if typ == "Hyperlink" and 400 <= sc <= 599:
+        dst = _norm(r.get("Destination", ""))
+        if not src or not dst or src == dst or src not in page_set or dst not in page_set:
+            continue
+
+        sc = _int(r.get("Status Code"))
+        if 400 <= sc <= 599:
             broken.append({"source": src, "destination": dst, "status": sc,
                            "anchor": (r.get("Anchor", "") or "").strip()})
-        if typ == "Hyperlink" and 300 <= sc <= 399:
+        if 300 <= sc <= 399:
             redir.append({"source": src, "destination": dst, "status": sc,
                           "anchor": (r.get("Anchor", "") or "").strip()})
-        if typ == "Hyperlink" and (r.get("Follow", "true") or "").strip().lower() == "false":
+        if (r.get("Follow", "true") or "").strip().lower() == "false":
             nofollow.append({"source": src, "destination": dst,
                              "anchor": (r.get("Anchor", "") or "").strip()})
 
