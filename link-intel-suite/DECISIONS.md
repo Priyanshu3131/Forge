@@ -156,3 +156,19 @@ Applied page_set validation before classifying:
 
 Result:
 External destinations are excluded and internal-link metrics now align with the rulebook.
+
+Decision #9
+
+Implemented AI-assisted cluster naming using local Ollama.
+
+Issue:
+Deterministic cluster labels occasionally produced weak names such as:
+
+reading
+which
+share
+great
+paragraph
+
+Reason:
+Cluster membership was generally correct, but the displayed labels were not always meaningful to human reviewers

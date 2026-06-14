@@ -39,3 +39,18 @@ Revised? No.
 Prompt: "Trace the data flow from link_candidates() through report generation and dashboard rendering. Determine why report.json contains link recommendations while the dashboard displays 'No recommendations yet'. Identify the smallest fix that exposes existing recommendation data to the dashboard."
 For: Debugging dashboard recommendation rendering and ensuring generated recommendations are visible during review.
 Revised? No.
+---
+
+* **Prompt:** "Implement AI-assisted cluster naming using local Ollama only. Keep clustering assignments unchanged. Use run.py as the integration point and li_topics(names) to inject generated names. Input to the model: cluster keyword, top keywords, and sample page titles. Output: a short cluster name (2-5 words). Add graceful fallback so that if Ollama is unavailable, the existing deterministic cluster label is preserved. No API keys, no external services, and no new dependencies beyond the Python standard library."
+
+* **For:** Improving cluster presentation quality while maintaining deterministic execution and hidden-dataset compatibility.
+
+* **Revised?** No.
+
+---
+
+* **Prompt:** "Before implementing AI cluster naming, determine whether the solution requires an external API key, internet access, or third-party model provider. Verify whether a local Ollama-based implementation can be used instead and ensure python run.py <export> continues to work when no model is available."
+
+* **For:** Validating submission safety and ensuring AI enhancements do not introduce grading-time failures.
+
+* **Revised?** No.
